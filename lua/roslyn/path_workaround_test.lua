@@ -1,4 +1,4 @@
-local path_workaround = require("roslyn.path_workaround")
+local M = require("roslyn.path_workaround")
 local mini_test = require("mini.test")
 local T = mini_test.new_set()
 
@@ -13,7 +13,7 @@ local test_data = {
 	},
 }
 
-local M = {}
+-- local M = {}
 T.path_workaround = mini_test.new_set()
 
 -- function T.path_workaround.test_1()
@@ -40,21 +40,6 @@ end
 
 function T.path_workaround.remove_leading_slash_2_back()
 	mini_test.expect.equality(M.remove_leading_slashes("\\\\a"), "a")
-end
-
-function M.remove_trailing_slashes(path)
-	local backslashes_removed = string.gsub(path, "\\*$", "")
-	local forward_slashes_removed = string.gsub(backslashes_removed, "/*$", "")
-	return forward_slashes_removed
-end
-
-function M.join_2_paths(path1, path2)
-	if path1 == "" then
-		return path2
-	end
-
-	-- ensure only one slash separates the two paths
-	return M.remove_trailing_slashes(path1) .. "/" .. M.remove_leading_slashes(path2)
 end
 
 function T.path_workaround.join_2_paths_empty_path1()
