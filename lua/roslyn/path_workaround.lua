@@ -9,12 +9,6 @@ function M.joinpath(...)
 	return output
 end
 
-function M.joinpath_workaround(...)
-	local paths = { ... }
-	for i, path in pairs(paths) do
-	end
-end
-
 -- function M.handle_first_path(path, num_paths)
 -- 	local out = path
 -- 	if num_paths > 1 then
