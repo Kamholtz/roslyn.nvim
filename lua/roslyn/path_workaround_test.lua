@@ -20,12 +20,6 @@ T.path_workaround = mini_test.new_set()
 -- 	mini_test.expect.equality(path_workaround.joinpath("a", "b"), "c")
 -- end
 
-function M.remove_leading_slashes(path)
-	local backslashes_removed = string.gsub(path, "^\\*", "")
-	local forward_slashes_removed = string.gsub(backslashes_removed, "^/*", "")
-	return forward_slashes_removed
-end
-
 function T.path_workaround.remove_leading_slash_forward()
 	mini_test.expect.equality(M.remove_leading_slashes("/a"), "a")
 end
@@ -60,15 +54,6 @@ end
 
 function T.path_workaround.join_2_paths_no_slashes()
 	mini_test.expect.equality(M.join_2_paths("a", "b"), "a/b")
-end
-
-function M.joinpath_workaround(...)
-	local paths = { ... }
-	local path_out = ""
-	for i, path in pairs(paths) do
-		path_out = M.join_2_paths(path_out, path)
-	end
-	return vim.fs.normalize(path_out)
 end
 
 function T.path_workaround.joinpath_workaround()
