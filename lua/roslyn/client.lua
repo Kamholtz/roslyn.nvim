@@ -2,6 +2,26 @@ local roslyn_lsp_rpc = require("roslyn.lsp")
 local hacks = require("roslyn.hacks")
 local path_workaround = require("roslyn.path_workaround")
 
+function get_publishDiagnostics_string()
+	if (vim.fn.has("nvim-0.10.0") == 0) and vim.lsp.protocol.Methods == nil then
+		return "textDocument/publishDiagnostics"
+	end
+	return vim.lsp.protocol.Methods.textDocument_publishDiagnostics
+end
+function get_diagnostic_string()
+	if (vim.fn.has("nvim-0.10.0") == 0) and vim.lsp.protocol.Methods == nil then
+		return "textDocument/diagnostic"
+	end
+
+	return vim.lsp.protocol.Methods.textDocument_diagnostic
+end
+function get_registerCapability_string()
+	if (vim.fn.has("nvim-0.10.0") == 0) and vim.lsp.protocol.Methods == nil then
+		return "client/registerCapability"
+	end
+	return vim.lsp.protocol.Methods.client_registerCapability
+end
+
 ---@class RoslynClient
 ---@field id number?
 ---@field target string
@@ -122,14 +142,12 @@ function M.spawn(cmd, target, settings, on_exit, on_attach, capabilities)
 			-- })
 		end),
 		handlers = {
-			[vim.lsp.protocol.Methods.textDocument_publishDiagnostics] = hacks.with_fixed_diagnostics_tags(
-				vim.lsp.handlers[vim.lsp.protocol.Methods.textDocument_publishDiagnostics]
+			[get_publishDiagnostics_string()] = hacks.with_fixed_diagnostics_tags(
+				vim.lsp.handlers[get_publishDiagnostics_string()]
 			),
-			[vim.lsp.protocol.Methods.textDocument_diagnostic] = hacks.with_fixed_diagnostics_tags(
-				vim.lsp.handlers[vim.lsp.protocol.Methods.textDocument_diagnostic]
-			),
-			[vim.lsp.protocol.Methods.client_registerCapability] = hacks.with_filtered_watchers(
-				vim.lsp.handlers[vim.lsp.protocol.Methods.client_registerCapability]
+			[get_diagnostic_string()] = hacks.with_fixed_diagnostics_tags(vim.lsp.handlers[get_diagnostic_string()]),
+			[get_registerCapability_string()] = hacks.with_filtered_watchers(
+				vim.lsp.handlers[get_registerCapability_string()]
 			),
 			["workspace/projectInitializationComplete"] = function()
 				vim.notify("Roslyn project initialization complete", vim.log.levels.INFO)
