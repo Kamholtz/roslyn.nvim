@@ -1,5 +1,6 @@
 local roslyn_lsp_rpc = require("roslyn.lsp")
 local hacks = require("roslyn.hacks")
+local path_workaround = require("roslyn.path_workaround")
 
 ---@class RoslynClient
 ---@field id number?
@@ -54,7 +55,7 @@ local M = {}
 ---@param capabilities table
 function M.spawn(cmd, target, settings, on_exit, on_attach, capabilities)
 	local data_path = vim.fn.stdpath("data") --[[@as string]]
-	local server_path = vim.fs.joinpath(data_path, "roslyn", "Microsoft.CodeAnalysis.LanguageServer.dll")
+	local server_path = path_workaround.joinpath(data_path, "roslyn", "Microsoft.CodeAnalysis.LanguageServer.dll")
 	if not vim.uv.fs_stat(server_path) then
 		vim.notify_once(
 			"Roslyn LSP server not installed. Run CSInstallRoslyn to install.",
@@ -134,10 +135,10 @@ function M.spawn(cmd, target, settings, on_exit, on_attach, capabilities)
 				vim.notify("Roslyn project initialization complete", vim.log.levels.INFO)
 				spawned:initialize()
 			end,
-            ["workspace/_roslyn_projectHasUnresolvedDependencies"] = function()
-                vim.notify("Detected missing dependencies. Run dotnet restore command.", vim.log.levels.ERROR)
-                return vim.NIL
-            end,
+			["workspace/_roslyn_projectHasUnresolvedDependencies"] = function()
+				vim.notify("Detected missing dependencies. Run dotnet restore command.", vim.log.levels.ERROR)
+				return vim.NIL
+			end,
 		},
 		on_exit = on_exit,
 	})

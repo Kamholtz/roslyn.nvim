@@ -1,3 +1,5 @@
+local path_workaround = require("roslyn.path_workaround")
+
 local nuget = {
 	[[<?xml version="1.0" encoding="utf-8"?>]],
 	[[<configuration>]],
@@ -66,7 +68,7 @@ end
 local M = {}
 
 function M.install(dotnet_cmd, roslyn_pkg_version)
-	local server_path = vim.fs.joinpath(vim.fn.stdpath("data")--[[@as string]], "roslyn")
+	local server_path = path_workaround.joinpath(vim.fn.stdpath("data")--[[@as string]], "roslyn")
 
 	if vim.fn.isdirectory(server_path) == 1 then
 		local reinstall = false
@@ -94,8 +96,8 @@ function M.install(dotnet_cmd, roslyn_pkg_version)
 	end
 	local roslyn_pkg_name = "microsoft.codeanalysis.languageserver." .. rid
 
-	vim.fn.writefile(csproj, vim.fs.joinpath(download_path, "ServerDownload.csproj"))
-	vim.fn.writefile(nuget, vim.fs.joinpath(download_path, "NuGet.config"))
+	vim.fn.writefile(csproj, path_workaround.joinpath(download_path, "ServerDownload.csproj"))
+	vim.fn.writefile(nuget, path_workaround.joinpath(download_path, "NuGet.config"))
 
 	local waited = vim.system({
 		dotnet_cmd,
@@ -115,7 +117,15 @@ function M.install(dotnet_cmd, roslyn_pkg_version)
 	end
 
 	vim.fn.rename(
-		vim.fs.joinpath(download_path, "out", roslyn_pkg_name, roslyn_pkg_version, "content", "LanguageServer", rid),
+		path_workaround.joinpath(
+			download_path,
+			"out",
+			roslyn_pkg_name,
+			roslyn_pkg_version,
+			"content",
+			"LanguageServer",
+			rid
+		),
 		server_path
 	)
 
