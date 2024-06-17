@@ -75,6 +75,11 @@ function M.init_buf_targets(bufnr)
 
 	local bufpath = util.path.sanitize(bufname)
 	local targets, prefered_target = find_possible_targets(bufpath)
+
+	if M.server_config.target_filter ~= nil then
+		targets, prefered_target = M.server_config.target_filter(targets, prefered_target)
+	end
+
 	if prefered_target then
 		set_selected_target(bufnr, prefered_target)
 	elseif #targets > 1 then
